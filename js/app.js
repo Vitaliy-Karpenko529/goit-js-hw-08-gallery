@@ -64,20 +64,20 @@ const galleryItems = [
   },
 ];
 // reference
-const refs = {
-    allGallery: document.querySelector('.js-gallery'),
-    changeImg: document.querySelector('.lightbox__image'),
-    closeModalBtn: document.querySelector('[data-action="close-lightbox"]'),
-    modalBackdrop: document.querySelector('.lightbox__overlay'),
-    modalWindow: document.querySelector('.js-lightbox'),
 
-}
+     const allGalleryRef = document.querySelector('.js-gallery');
+     const changeImgRef = document.querySelector('.lightbox__image');
+     const closeModalBtnRef = document.querySelector('[data-action="close-lightbox"]');
+     const modalBackdropRef = document.querySelector('.lightbox__overlay');
+     const modalWindowRef = document.querySelector('.js-lightbox');
+
+
 // dynamick marcup + rendering
-const galleryMarcup = createGalleryMarcup(galleryItems);
-refs.allGallery.insertAdjacentHTML('beforeend', galleryMarcup);
+const galleryMarcup = createGalleryMarcup();
+allGalleryRef.insertAdjacentHTML('beforeend', galleryMarcup);
 
-function createGalleryMarcup(items) {
-    return items.map(({ preview, original, description }) => {
+function createGalleryMarcup() {
+    return galleryItems.map(({ preview, original, description }) => {
         return `
          <li class="gallery__item">
         <a
@@ -97,19 +97,29 @@ function createGalleryMarcup(items) {
         .join('');
 }
 
+
+function setImageAttr(src, alt) {
+  changeImgRef.setAttribute("src", src);
+  changeImgRef.setAttribute("alt", alt);
+};
+
+
 // event listener
-refs.allGallery.addEventListener('click', onGalleryMarcupClick)
+allGalleryRef.addEventListener('click', onGalleryMarcupClick)
 function onGalleryMarcupClick(evt) {
-    const isImgGalleryEl = evt.target.classList.contains('gallery__image');
-    if (!isImgGalleryEl) {
-        return;
-    }
- evt.preventDefault();
+
+  evt.preventDefault();
+  
+  if (evt.target.nodeName !== 'IMG') {
+    return;
+  }
 
     // modal open + event listener
-    refs.modalWindow.classList.add('is-open');
-    refs.changeImg.alt = evt.target.alt;
-    refs.changeImg.src = evt.target.dataset.source;
+    modalWindowRef.classList.add('is-open');
+  setImageAttr(
+    evt.target.dataset.source,
+    evt.target.alt,
+  );
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeModal();
@@ -119,12 +129,11 @@ function onGalleryMarcupClick(evt) {
 
 // modal close
 
-refs.closeModalBtn.addEventListener('click', closeModal);
-refs.modalBackdrop.addEventListener('click', closeModal);
-function closeModal(evt) {
-    refs.modalWindow.classList.remove('is-open');
-    refs.changeImg.alt = "";
-    refs.changeImg.src = "";
+closeModalBtnRef.addEventListener('click', onCloseModal);
+modalBackdropRef.addEventListener('click', onCloseModal);
+function onCloseModal(evt) {
+    modalWindowRef.classList.remove('is-open');
+     setImageAttr("", "")
     window.removeEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeModal();
